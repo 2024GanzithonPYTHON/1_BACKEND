@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .  # Dockerfile이 있는 경로
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    restart: always
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
