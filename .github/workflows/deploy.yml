@@ -42,8 +42,9 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$EC2_KEY" > ~/.ssh/id_rsa
+          sudo ssh-keygen -p -m PEM -f ~/.ssh/id_rsa
+          cat ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa  # SSH 키에 적절한 권한 부여
-          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa
 
       - name: Add EC2 host key to known hosts
         run: |
