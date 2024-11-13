@@ -38,6 +38,3 @@ out/
 
 ### AWS ###
 application-aws.yml
-
-### test ###
-application-test.yml

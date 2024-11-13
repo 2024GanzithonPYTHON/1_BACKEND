@@ -20,11 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: ./gradlew build -Ddb.url=$DB_URL -Ddb.username=$DB_USERNAME -Ddb.password=$DB_PASSWORD
+        run: ./gradlew build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
