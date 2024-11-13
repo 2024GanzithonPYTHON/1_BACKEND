@@ -46,7 +46,7 @@ jobs:
 
       - name: Add EC2 host key to known hosts
         run: |
-          ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+          ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
 
       - name: Copy JAR file to EC2
         env:
