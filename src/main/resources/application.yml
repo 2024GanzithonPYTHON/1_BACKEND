@@ -6,8 +6,8 @@ spring:
     generate-ddl: true
     database: mysql
   profiles:
-    include:
-      - aws
+    active:
+      - test
 
 logging:
   level:
