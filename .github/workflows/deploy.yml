@@ -1,0 +1,57 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: spring-boot-app
+          path: build/libs/*.jar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: spring-boot-app
+
+      - name: Copy JAR file to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          scp -i $EC2_KEY -o StrictHostKeyChecking=no build/libs/*.jar $EC2_USER@$EC2_HOST:/home/ubuntu/app.jar
+
+      - name: Deploy on EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          ssh -i $EC2_KEY -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            docker stop springboot_app || true && docker rm springboot_app || true
+            docker run -d --name springboot_app -p 8080:8080 -v /home/ubuntu/app.jar:/app/app.jar openjdk:17 java -jar /app/app.jar
+          EOF
