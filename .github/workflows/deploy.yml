@@ -39,6 +39,8 @@ jobs:
           name: spring-boot-app
 
       - name: Save SSH key
+        env:
+          EC2_KEY: ${{ secrets.EC2_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$EC2_KEY" > ~/.ssh/private-key.pem
