@@ -64,8 +64,19 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no path: build/libs/*.jar $EC2_USER@$EC2_HOST:~/app.jar
+          # jar 파일 찾기
+          jar_file=$(find build/libs -name "*.jar" ! -name "*plain.jar" -type f | head -n 1)
+          
+          # 파일 존재 확인
+          if [ -z "$jar_file" ]; then
+          echo "No JAR file found!"
+          exit 1
+          fi
+          echo "Found JAR file: $jar_file"
     
+          # 파일 복사
+          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no "$jar_file" $EC2_USER@$EC2_HOST:~/app.jar
+
 
       - name: Deploy on EC2
         env:
