@@ -56,8 +56,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          cd ${{ github.workspace }}
-          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no *.jar $EC2_USER@$EC2_HOST:/app.jar
+          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no *.jar $EC2_USER@$EC2_HOST:~/app.jar
     
 
       - name: Deploy on EC2
@@ -73,7 +72,7 @@ jobs:
           docker rm springboot_app || true
           docker run -d --name springboot_app \
           -p 8080:8080 \
-          -v /app.jar:/app/app.jar \
+          -v ~/app.jar:/app/app.jar \
           -e DB_URL=${DB_URL} \
           -e DB_USERNAME=${DB_USERNAME} \
           -e DB_PASSWORD=${DB_PASSWORD} \
