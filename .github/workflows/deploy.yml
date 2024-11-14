@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$EC2_KEY" > ~/.ssh/private-key.pem
-          chmod 600 ~/private-key.pem  # pem 키에 적절한 권한 부여
+          chmod 600 ~/.ssh/private-key.pem  # pem 키에 적절한 권한 부여
           eval $(ssh-agent -s)
 
       - name: Add EC2 public key to known hosts
