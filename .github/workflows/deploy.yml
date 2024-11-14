@@ -40,13 +40,14 @@ jobs:
 
       - name: Save SSH key
         run: |
-          echo "$EC2_KEY" > ~/private-key.pem
+          mkdir -p ~/.ssh
+          echo "$EC2_KEY" > ~/.ssh/private-key.pem
           chmod 600 ~/private-key.pem  # pem 키에 적절한 권한 부여
+          eval $(ssh-agent -s)
 
       - name: Add EC2 public key to known hosts
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/private-key.pem >> ~/.ssh/known_hosts
 
       - name: Copy JAR file to EC2
         env:
@@ -54,18 +55,18 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
           cd ${{ github.workspace }}
-          scp -i ~/private-key.pem -o StrictHostKeyChecking=no build/libs/*.jar $EC2_USER@$EC2_HOST:/home/ubuntu/app.jar
+          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no *.jar $EC2_USER@$EC2_HOST:/home/ubuntu/app.jar
+    
 
       - name: Deploy on EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_KEY: ${{ secrets.EC2_KEY }}
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          ssh -i $EC2_KEY -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+          ssh -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             docker stop springboot_app || true && docker rm springboot_app || true
             docker run -d --name springboot_app -p 8080:8080 -v /home/ubuntu/app.jar:/app/app.jar openjdk:17 
           export DB_URL=${DB_URL}
