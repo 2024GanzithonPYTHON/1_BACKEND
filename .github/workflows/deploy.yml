@@ -37,6 +37,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: spring-boot-app
+          path: build/libs
 
       - name: Save SSH key
         env:
@@ -56,7 +57,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no *.jar $EC2_USER@$EC2_HOST:~/app.jar
+          scp -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no path: build/libs/*.jar $EC2_USER@$EC2_HOST:~/app.jar
     
 
       - name: Deploy on EC2
@@ -67,7 +68,7 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          ssh -i $EC2_KEY -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+          ssh -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           docker stop springboot_app || true
           docker rm springboot_app || true
           docker run -d --name springboot_app \
