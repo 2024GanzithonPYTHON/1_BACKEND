@@ -1,5 +1,6 @@
 package com.ganzithon.go_farming.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,12 +10,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -42,7 +48,7 @@ public class SecurityConfig {
 				// 로그아웃 설정
 				.logout(logout -> logout
 						.logoutRequestMatcher(new AntPathRequestMatcher("/users/logout")) // 로그아웃 요청 매핑
-						.logoutSuccessUrl("/") // 로그아웃 성공 후 리디렉션 경로
+						.logoutSuccessHandler(customLogoutSuccessHandler()) // 커스텀 핸들러 추가
 						.invalidateHttpSession(true) // 세션 무효화
 						.deleteCookies("JSESSIONID") // 쿠키 삭제
 				);
@@ -50,12 +56,27 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+	// 커스텀 로그아웃 성공 핸들러
+	@Bean
+	LogoutSuccessHandler customLogoutSuccessHandler() {
+		return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.Authentication authentication) -> {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("application/json");
+
+			Map<String, String> responseBody = new HashMap<>();
+			responseBody.put("message", "로그아웃 성공");
+
+			ObjectMapper objectMapper = new ObjectMapper();
+			response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+		};
+	}
+
 	// CORS 설정 소스 메서드 정의
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowedOrigins(List.of("http://localhost:3000")); // 허용할 프론트엔드 주소
-		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // PATCH 메서드 추가
 		config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
 		config.setAllowCredentials(true); // 자격 증명 허용 (예: 쿠키)
 
@@ -76,3 +97,4 @@ public class SecurityConfig {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 }
+

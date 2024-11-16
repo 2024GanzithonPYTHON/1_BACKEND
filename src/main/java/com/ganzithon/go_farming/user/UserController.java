@@ -67,5 +67,9 @@ public class UserController {
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증 실패."); // 인증 실패
         }
+
+
     }
+
+
 }

@@ -1,6 +1,6 @@
 package com.ganzithon.go_farming.user;
 
-import com.ganzithon.go_farming.bookmark.Folder;
+//import com.ganzithon.go_farming.bookmark.Folder;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +39,7 @@ public class User {
 
     private String region; // 지역 정보
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Folder> folders; // 사용자가 생성한 폴더
+   /* @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Folder> folders; // 사용자가 생성한 폴더 */
 }
 
