@@ -1,0 +1,78 @@
+package com.ganzithon.go_farming.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+	// Security Filter Chain 설정
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http
+				// 접근 허용 URL 설정
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll() // 사용자 API 공개
+						.anyRequest().authenticated() // 그 외의 요청은 인증 필요
+				)
+				// CSRF 보호 비활성화 (API를 위해)
+				.csrf(csrf -> csrf.disable())
+				// CORS 설정 추가
+				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+				// 폼 로그인 설정
+				.formLogin(formLogin -> formLogin
+						.loginPage("/users/login") // 사용자 정의 로그인 페이지
+						.defaultSuccessUrl("/place") // 로그인 성공 후 리디렉션 경로
+						.permitAll()
+				)
+				// 로그아웃 설정
+				.logout(logout -> logout
+						.logoutRequestMatcher(new AntPathRequestMatcher("/users/logout")) // 로그아웃 요청 매핑
+						.logoutSuccessUrl("/") // 로그아웃 성공 후 리디렉션 경로
+						.invalidateHttpSession(true) // 세션 무효화
+						.deleteCookies("JSESSIONID") // 쿠키 삭제
+				);
+
+		return http.build();
+	}
+
+	// CORS 설정 소스 메서드 정의
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(List.of("http://localhost:3000")); // 허용할 프론트엔드 주소
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
+		config.setAllowCredentials(true); // 자격 증명 허용 (예: 쿠키)
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", config); // 모든 경로에 대해 설정 적용
+		return source;
+	}
+
+	// PasswordEncoder 설정
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	// AuthenticationManager 설정
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+}
