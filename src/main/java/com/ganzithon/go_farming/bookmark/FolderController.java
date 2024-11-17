@@ -1,6 +1,6 @@
 package com.ganzithon.go_farming.bookmark;
 
-import com.ganzithon.go_farming.location.Location;
+//import com.ganzithon.go_farming.location.Location;
 import com.ganzithon.go_farming.user.User;
 import com.ganzithon.go_farming.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +65,22 @@ public class FolderController {
         Long userId = (Long) session.getAttribute("userId");
         folderService.deleteFolder(folderId); // Optional: userId를 사용한 검증 추가 가능
         return ResponseEntity.ok("폴더가 삭제되었습니다.");
+    }
+
+    // 세션 기반으로 폴더 이름 수정
+    @PutMapping("/{folderId}")
+    public ResponseEntity<?> updateFolderName(@PathVariable Long folderId, @RequestBody String newName, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        try {
+            Folder updatedFolder = folderService.updateFolderName(folderId, newName);
+            return ResponseEntity.ok(updatedFolder);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     // 세션 기반으로 폴더에 위치 추가

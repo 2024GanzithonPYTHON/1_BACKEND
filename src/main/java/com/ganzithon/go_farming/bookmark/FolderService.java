@@ -37,6 +37,15 @@ public class FolderService {
         folderRepository.deleteById(folderId); // 폴더 삭제
     }
 
+    // 폴더 이름 수정 메서드 추가
+    public Folder updateFolderName(Long folderId, String newName) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + folderId)); // 폴더 조회
+
+        folder.setFolderName(newName); // 폴더 이름 수정
+        return folderRepository.save(folder); // 수정된 폴더 저장
+    }
+
     // 폴더에 위치 추가
    /* public SavedLocation addLocationToFolder(Long folderId, Location location) {
         Folder folder = folderRepository.findById(folderId)
