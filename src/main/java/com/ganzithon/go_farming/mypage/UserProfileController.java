@@ -1,9 +1,9 @@
 package com.ganzithon.go_farming.mypage;
 
-import com.ganzithon.go_farming.question.Question;
+/*import com.ganzithon.go_farming.question.Question;
 import com.ganzithon.go_farming.question.QuestionService;
 import com.ganzithon.go_farming.review.Review;
-import com.ganzithon.go_farming.review.ReviewService;
+import com.ganzithon.go_farming.review.ReviewService;*/
 import com.ganzithon.go_farming.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +15,11 @@ public class UserProfileController {
     @Autowired
     private UserProfileService userProfileService;
 
-    @Autowired
+    /*@Autowired
     private ReviewService reviewService;
 
     @Autowired
-    private QuestionService questionService;
+    private QuestionService questionService;*/
 
     // 닉네임 수정
     @PatchMapping("/{userId}/nickname")
@@ -40,18 +40,18 @@ public class UserProfileController {
     }
 
     // 작성한 리뷰 조회
-    @GetMapping("/{userId}/reviews")
+    /*@GetMapping("/{userId}/reviews")
     public List<Review> getUserReviews(@PathVariable Long userId) {
         User user = new User();
         user.setUserId(userId); // 필요 시 User 엔티티를 직접 로드하도록 수정 가능
         return reviewService.getUserReviews(user);
-    }
+    }*/
 
     // 작성한 질문 조회
-    @GetMapping("/{userId}/questions")
+    /*@GetMapping("/{userId}/questions")
     public List<Question> getUserQuestions(@PathVariable Long userId) {
         User user = new User();
         user.setUserId(userId); // 필요 시 User 엔티티를 직접 로드하도록 수정 가능
         return questionService.getUserQuestions(user);
-    }
+    }*/
 }
