@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -51,6 +52,16 @@ public class SecurityConfig {
 						.logoutSuccessHandler(customLogoutSuccessHandler()) // 커스텀 핸들러 추가
 						.invalidateHttpSession(true) // 세션 무효화
 						.deleteCookies("JSESSIONID") // 쿠키 삭제
+				)
+				.sessionManagement(sessionManagement -> sessionManagement
+						.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 필요 시 세션 생성
+						.maximumSessions(1) // 사용자당 세션 최대 개수 설정
+						.maxSessionsPreventsLogin(false) // 새로운 로그인을 허용 (기존 세션 만료)
+				)
+
+				// 세션 무효화 URL 추가
+				.sessionManagement(sessionManagement -> sessionManagement
+						.invalidSessionUrl("/users/login") // 세션 무효화 시 리디렉션 경로 설정
 				);
 
 		return http.build();
