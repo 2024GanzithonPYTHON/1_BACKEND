@@ -19,7 +19,7 @@ public class Folder {
 
     private String folderName; // 폴더 이름
 
-    @ManyToOne // Folder는 여러 User에 속할 수 있음 (다대일 관계)
+    @ManyToOne // 여러Folder는 하나의User에 속할 수 있음 (다대일 관계)
     @JoinColumn(name = "user_id", nullable = false)
     // 데이터베이스에서 외래 키 이름을 "user_id"로 지정하고, null이 될 수 없도록 설정
     private User user; // 폴더를 소유한 사용자
