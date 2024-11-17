@@ -1,5 +1,6 @@
 package com.ganzithon.go_farming.bookmark;
 
+import com.ganzithon.go_farming.location.Location;
 import com.ganzithon.go_farming.user.User;
 import com.ganzithon.go_farming.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,7 +54,7 @@ public class FolderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFolder);
     }
 
-    // 폴더 삭제
+    // 세션 기반으로 폴더 삭제
     @DeleteMapping("/{folderId}")
     public ResponseEntity<?> deleteFolder(@PathVariable Long folderId, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -62,11 +63,27 @@ public class FolderController {
         }
 
         Long userId = (Long) session.getAttribute("userId");
-        folderService.deleteFolder(folderId); // userId 검증 필요시 추가 로직 포함 가능
-        return ResponseEntity.ok().body("폴더 삭제 성공");
+        folderService.deleteFolder(folderId); // Optional: userId를 사용한 검증 추가 가능
+        return ResponseEntity.ok("폴더가 삭제되었습니다.");
     }
 
-    // 폴더에서 위치 제거
+    // 세션 기반으로 폴더에 위치 추가
+    /*@PostMapping("/{folderId}/locations")
+    public ResponseEntity<?> addLocation(@PathVariable Long folderId, @RequestBody Location location, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        try {
+            folderService.addLocationToFolder(folderId, location);
+            return ResponseEntity.status(HttpStatus.CREATED).body("위치가 폴더에 추가되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }*/
+
+    // 세션 기반으로 폴더에서 위치 제거
     @DeleteMapping("/{folderId}/locations/{locationId}")
     public ResponseEntity<?> removeLocation(@PathVariable Long folderId, @PathVariable Long locationId, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -74,8 +91,11 @@ public class FolderController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        folderService.removeLocationFromFolder(folderId, locationId); // userId 검증 필요시 추가 로직 포함 가능
-        return ResponseEntity.ok().body("위치 제거 성공");
+        try {
+            folderService.removeLocationFromFolder(folderId, locationId);
+            return ResponseEntity.ok("위치가 폴더에서 제거되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }
