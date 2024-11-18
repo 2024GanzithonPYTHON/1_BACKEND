@@ -24,4 +24,5 @@ public class SavedLocation {
     /*@ManyToOne // Location과 다대일 관계 설정
     @JoinColumn(name = "location_id", nullable = false) // 외래키 컬럼(location_id) 설정
     private Location location; // 다른 패키지의 Location 엔티티 참조*/
+
 }
