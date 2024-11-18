@@ -18,12 +18,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Create application-aws.yml
         run: |
           ls
           echo "${{ secrets.AWS_CONFIGURATION }}" | base64 --decode > ./src/main/resources/application-aws.yml
-
+          cat ./src/main/resources/application-aws.yml
       - name: Build with Gradle
         run: ./gradlew build
 
