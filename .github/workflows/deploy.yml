@@ -24,6 +24,8 @@ jobs:
           ls ./src/main/resources
           cat ./src/main/resources/application-aws.yml
       - name: Build with Gradle
+        env:
+          SPRING_PROFILES_ACTIVE: aws
         run: ./gradlew build
 
       - name: Upload artifact
