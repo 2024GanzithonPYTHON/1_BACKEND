@@ -33,7 +33,9 @@ public class SecurityConfig {
 		http
 				// 접근 허용 URL 설정
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll() // 사용자 API 공개
+						.requestMatchers(new AntPathRequestMatcher("/users/**"),
+								new AntPathRequestMatcher("/province/**"),
+								new AntPathRequestMatcher("/category")).permitAll() // 사용자 API 공개
 						.anyRequest().authenticated() // 그 외의 요청은 인증 필요
 				)
 				// CSRF 보호 비활성화 (API를 위해)
@@ -86,7 +88,7 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:3000")); // 허용할 프론트엔드 주소
+		config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080")); // 허용할 프론트엔드/백엔드 주소
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // PATCH 메서드 추가
 		config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
 		config.setAllowCredentials(true); // 자격 증명 허용 (예: 쿠키)

@@ -1,11 +1,13 @@
 package com.ganzithon.go_farming.common.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.util.Objects;
 
 @MappedSuperclass
+@Getter
 public class BaseEntity<T extends AbstractAggregateRoot<T>> extends AbstractAggregateRoot<T> {
 
     @Id
