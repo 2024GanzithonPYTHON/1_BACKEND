@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-### AWS ###
+### yml ###
 application-aws.yml
+application-test.yml
