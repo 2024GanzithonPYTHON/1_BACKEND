@@ -19,10 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Create application-aws.yml and application-credentials.yml
+      - name: Create application-aws.yml
         run: |
           mkdir -p ./src/main/resources
           echo "${{ secrets.AWS_CONFIGURATION }}" | base64 --decode > ./src/main/resources/application-aws.yml
+        shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build
