@@ -19,6 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Create application-aws.yml and application-credentials.yml
+        run: |
+          mkdir -p ./src/main/resources
+          echo "${{ secrets.AWS_CONFIGURATION }}" | base64 --decode > ./src/main/resources/application-aws.yml
+
       - name: Build with Gradle
         run: ./gradlew build
 
@@ -82,9 +87,6 @@ jobs:
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           ssh -i ~/.ssh/private-key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           docker stop springboot_app || true
@@ -92,8 +94,5 @@ jobs:
           docker run -d --name springboot_app \
           -p 8080:8080 \
           -v ~/app.jar:/app/app.jar \
-          -e DB_URL=${DB_URL} \
-          -e DB_USERNAME=${DB_USERNAME} \
-          -e DB_PASSWORD=${DB_PASSWORD} \
           openjdk:17 java -jar /app/app.jar
           EOF
