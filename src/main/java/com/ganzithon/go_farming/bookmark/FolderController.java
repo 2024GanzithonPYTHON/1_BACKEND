@@ -100,18 +100,18 @@ public class FolderController {
     }*/
 
     // 세션 기반으로 폴더에서 위치 제거
-    @DeleteMapping("/{folderId}/locations/{locationId}")
-    public ResponseEntity<?> removeLocation(@PathVariable Long folderId, @PathVariable Long locationId, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
-        }
-
-        try {
-            folderService.removeLocationFromFolder(folderId, locationId);
-            return ResponseEntity.ok("위치가 폴더에서 제거되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @DeleteMapping("/{folderId}/locations/{locationId}")
+//    public ResponseEntity<?> removeLocation(@PathVariable Long folderId, @PathVariable Long locationId, HttpServletRequest request) {
+//        HttpSession session = request.getSession(false);
+//        if (session == null || session.getAttribute("userId") == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+//        }
+//
+//        try {
+//            folderService.removeLocationFromFolder(folderId, locationId);
+//            return ResponseEntity.ok("위치가 폴더에서 제거되었습니다.");
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 }

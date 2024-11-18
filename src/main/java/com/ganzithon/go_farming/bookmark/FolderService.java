@@ -1,6 +1,9 @@
 package com.ganzithon.go_farming.bookmark;
 
 //import com.ganzithon.go_farming.location.Location;
+import com.ganzithon.go_farming.bookmark.SavedLocationRepository;
+import com.ganzithon.go_farming.bookmark.Folder;
+import com.ganzithon.go_farming.bookmark.FolderRepository;
 import com.ganzithon.go_farming.user.User;
 import org.springframework.stereotype.Service;
 
@@ -59,10 +62,10 @@ public class FolderService {
     }*/
 
     // 폴더에서 위치 제거
-    public void removeLocationFromFolder(Long folderId, Long locationId) {
-        if (!savedLocationRepository.existsByFolderFolderIdAndLocationLocationId(folderId, locationId)) {
-            throw new IllegalArgumentException("SavedLocation not found with folderId: " + folderId + " and locationId: " + locationId);
-        }
-        savedLocationRepository.deleteByFolderFolderIdAndLocationLocationId(folderId, locationId); // SavedLocation 삭제
-    }
+//    public void removeLocationFromFolder(Long folderId, Long locationId) {
+//        if (!savedLocationRepository.existsByFolderFolderIdAndLocationLocationId(folderId, locationId)) {
+//            throw new IllegalArgumentException("SavedLocation not found with folderId: " + folderId + " and locationId: " + locationId);
+//        }
+//        savedLocationRepository.deleteByFolderFolderIdAndLocationLocationId(folderId, locationId); // SavedLocation 삭제
+//    }
 }

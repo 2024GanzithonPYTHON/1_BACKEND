@@ -1,6 +1,7 @@
 package com.ganzithon.go_farming.bookmark;
 
 //import com.ganzithon.go_farming.location.Location; // 다른 패키지의 Location 엔티티를 참조
+import com.ganzithon.go_farming.bookmark.Folder;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
