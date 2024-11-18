@@ -1,4 +1,5 @@
 package com.ganzithon.go_farming.bookmark;
+import com.ganzithon.go_farming.bookmark.Folder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
