@@ -21,9 +21,8 @@ jobs:
 
       - name: Create application-aws.yml
         run: |
-          mkdir -p ./src/main/resources
+          pwd
           echo "${{ secrets.AWS_CONFIGURATION }}" | base64 --decode > ./src/main/resources/application-aws.yml
-        shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build
