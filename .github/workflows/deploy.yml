@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
       - name: Create application-aws.yml
         run: |
-          echo "${{ secrets.AWS_CONFIGURATION }}" > ./src/main/resources/application-aws.yml
+          echo "${{ secrets.AWS_CONFIGURATION }}" | base64 --decode > ./src/main/resources/application-aws.yml
           ls ./src/main/resources
           cat ./src/main/resources/application-aws.yml
       - name: Build with Gradle
