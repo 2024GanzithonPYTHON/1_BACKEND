@@ -95,5 +95,6 @@ jobs:
           docker run -d --name springboot_app \
           -p 8080:8080 \
           -v ~/app.jar:/app/app.jar \
+          -e SPRING_PROFILES_ACTIVE=aws \
           openjdk:17 java -jar /app/app.jar
           EOF
