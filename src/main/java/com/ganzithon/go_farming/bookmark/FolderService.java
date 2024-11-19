@@ -68,4 +68,16 @@ public class FolderService {
 //        }
 //        savedLocationRepository.deleteByFolderFolderIdAndLocationLocationId(folderId, locationId); // SavedLocation 삭제
 //    }
+
+    // 폴더 안의 위치 조회
+    /*public List<Location> getLocationsInFolder(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new IllegalArgumentException("Folder not found with id: " + folderId));
+
+        return savedLocationRepository.findByFolderFolderId(folderId)
+                .stream()
+                .map(SavedLocation::getLocation)
+                .toList();
+    }*/
+
 }

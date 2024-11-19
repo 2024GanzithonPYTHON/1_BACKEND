@@ -1,6 +1,7 @@
 package com.ganzithon.go_farming.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,14 +44,11 @@ public class SecurityConfig {
 				// CORS 설정 추가
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				// 폼 로그인 설정
-				.formLogin(formLogin -> formLogin
-						.loginPage("/users/login") // 사용자 정의 로그인 페이지
-						.defaultSuccessUrl("/place") // 로그인 성공 후 리디렉션 경로
-						.permitAll()
+				.formLogin(formLogin -> formLogin.disable()
 				)
 				// 로그아웃 설정
 				.logout(logout -> logout
-						.logoutRequestMatcher(new AntPathRequestMatcher("/users/logout")) // 로그아웃 요청 매핑
+						.logoutRequestMatcher(new AntPathRequestMatcher("/users/logout","POST")) // 로그아웃 요청 매핑
 						.logoutSuccessHandler(customLogoutSuccessHandler()) // 커스텀 핸들러 추가
 						.invalidateHttpSession(true) // 세션 무효화
 						.deleteCookies("JSESSIONID") // 쿠키 삭제
@@ -73,6 +71,10 @@ public class SecurityConfig {
 	@Bean
 	LogoutSuccessHandler customLogoutSuccessHandler() {
 		return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.Authentication authentication) -> {
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				session.invalidate(); // 세션 무효화
+			}
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/json");
 
@@ -84,11 +86,12 @@ public class SecurityConfig {
 		};
 	}
 
+
 	// CORS 설정 소스 메서드 정의
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080")); // 허용할 프론트엔드/백엔드 주소
+		config.setAllowedOrigins(List.of("*")); // 허용할 프론트엔드/백엔드 주소
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // PATCH 메서드 추가
 		config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
 		config.setAllowCredentials(true); // 자격 증명 허용 (예: 쿠키)

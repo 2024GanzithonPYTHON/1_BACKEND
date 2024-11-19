@@ -50,14 +50,14 @@ public class UserController {
         }
     }
 
-    @PostMapping("/logout")
+    /*@PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
         return ResponseEntity.ok().body("로그아웃 성공");
-    }
+    }*/
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(HttpServletRequest request) {

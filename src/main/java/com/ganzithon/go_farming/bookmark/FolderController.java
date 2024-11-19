@@ -114,4 +114,17 @@ public class FolderController {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 //        }
 //    }
+
+    // 폴더 안의 위치 조회
+    /*@GetMapping("/{folderId}/locations")
+    public ResponseEntity<?> getLocationsInFolder(@PathVariable Long folderId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        List<Location> locations = folderService.getLocationsInFolder(folderId);
+        return ResponseEntity.ok(locations);
+    }*/
+
 }
