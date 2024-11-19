@@ -91,7 +91,7 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("*")); // 허용할 프론트엔드/백엔드 주소
+		config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "https://go-farming.shop")); // 허용할 프론트엔드/백엔드 주소
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // PATCH 메서드 추가
 		config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
 		config.setAllowCredentials(true); // 자격 증명 허용 (예: 쿠키)
