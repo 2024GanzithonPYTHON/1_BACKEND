@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,10 +25,12 @@ public class Review extends BaseEntity<Review> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "place_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
 
     private String content;
@@ -48,5 +52,13 @@ public class Review extends BaseEntity<Review> {
         this.place = place;
         this.content = reviewRequestDTO.getContent();
         this.visitedCount = visitedCount;
+    }
+
+    public void like() {
+        this.likeCount++;
+    }
+
+    public void dislike() {
+        this.likeCount = Math.max(0, this.likeCount-1);
     }
 }

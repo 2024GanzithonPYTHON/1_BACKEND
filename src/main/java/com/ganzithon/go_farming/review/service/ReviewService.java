@@ -8,12 +8,10 @@ import com.ganzithon.go_farming.common.repository.PlaceRepository;
 import com.ganzithon.go_farming.common.response.ResponseDTO;
 import com.ganzithon.go_farming.common.response.Responses;
 import com.ganzithon.go_farming.common.service.S3Service;
-import com.ganzithon.go_farming.review.domain.Keyword;
-import com.ganzithon.go_farming.review.domain.Review;
-import com.ganzithon.go_farming.review.domain.ReviewKeyword;
-import com.ganzithon.go_farming.review.domain.ReviewPhoto;
+import com.ganzithon.go_farming.review.domain.*;
 import com.ganzithon.go_farming.review.dto.ReviewRequestDTO;
 import com.ganzithon.go_farming.review.dto.ReviewResponseDTO;
+import com.ganzithon.go_farming.review.repository.LikeRepository;
 import com.ganzithon.go_farming.review.repository.ReviewKeywordRepository;
 import com.ganzithon.go_farming.review.repository.ReviewPhotoRepository;
 import com.ganzithon.go_farming.review.repository.ReviewRepository;
@@ -39,6 +37,7 @@ public class ReviewService {
     private final S3Service s3Service;
     private final KeywordRepository keywordRepository;
     private final ReviewKeywordRepository reviewKeywordRepository;
+    private final LikeRepository likeRepository;
 
     public ResponseDTO<List<ReviewResponseDTO>> findReviews(Long placeId) {
         List<Review> reviews = reviewRepository.findAllByPlaceId(placeId);
@@ -95,6 +94,25 @@ public class ReviewService {
         if (review.getUser() != user) { throw new CustomException(Exceptions.UNAUTHORIZED);}
         reviewRepository.delete(review);
         return new ResponseDTO<>(Responses.NO_CONTENT);
+    }
+
+    @Transactional
+    public ResponseDTO<?> likeReview(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(Exceptions.REVIEW_NOT_EXIST));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
+
+        Optional<Like> like = likeRepository.findByUserUserIdAndReviewId(userId, reviewId);
+        if (like.isPresent()) {
+            likeRepository.delete(like.get());
+            review.dislike();
+        } else {
+            likeRepository.save(new Like(user, review));
+            review.like();
+        }
+
+        return new ResponseDTO<>(Responses.OK);
     }
 
 }

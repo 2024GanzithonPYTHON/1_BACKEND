@@ -59,4 +59,12 @@ public class ReviewController {
     private boolean notAuthorized(HttpSession session) {
         return session == null || session.getAttribute("userId") == null;
     }
+
+    @PostMapping("/review/{reviewId}/like")
+    public ResponseDTO<?> likeReview(@PathVariable Long reviewId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (notAuthorized(session)) {throw new CustomException(Exceptions.UNAUTHORIZED);}
+
+        return reviewService.likeReview(reviewId, (Long) session.getAttribute("userId"));
+    }
 }
