@@ -36,7 +36,9 @@ public class SecurityConfig {
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers(new AntPathRequestMatcher("/users/**"),
 								new AntPathRequestMatcher("/province/**"),
-								new AntPathRequestMatcher("/category")).permitAll() // 사용자 API 공개
+								new AntPathRequestMatcher("/category"),
+								new AntPathRequestMatcher(("/**"))
+								).permitAll() // 사용자 API 공개
 						.anyRequest().authenticated() // 그 외의 요청은 인증 필요
 				)
 				// CSRF 보호 비활성화 (API를 위해)
@@ -106,6 +108,12 @@ public class SecurityConfig {
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
+	// 인증 매니저
+//	@Bean
+//	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//		return authenticationConfiguration.getAuthenticationManager();
+//	}
 
 }
 
