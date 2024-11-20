@@ -23,21 +23,21 @@ public class UserProfileService {
 
     // 닉네임 수정
     public User updateNickname(Long userId, String nickname) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         user.setNickname(nickname);
         return userRepository.save(user);
     }
 
     // 프로필 사진 URL 수정
     public User updateProfilePicture(Long userId, String profilePictureUrl) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         user.setProfilePicture(profilePictureUrl);
         return userRepository.save(user);
     }
 
     // 비밀번호 수정
     public User updatePassword(Long userId, String password) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         user.setPassword(password);
         return userRepository.save(user);
     }
