@@ -8,6 +8,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -17,6 +19,7 @@ public class ReviewPhoto extends BaseEntity<ReviewPhoto> {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "review_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Review review;
 
     private String url;
