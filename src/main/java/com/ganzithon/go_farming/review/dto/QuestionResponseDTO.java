@@ -8,15 +8,16 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-public class QuestionDTO {
+public class QuestionResponseDTO {
 
+    private Long id;
     private Long userId;
     private Long reviewId;
     private String content;
     private LocalDate createdAt;
 
-    public static QuestionDTO of(Question question) {
-        return new QuestionDTO(question.getId(), question.getReview().getId(),
+    public static QuestionResponseDTO of(Question question) {
+        return new QuestionResponseDTO(question.getId(), question.getUser().getUserId(), question.getReview().getId(),
                 question.getContent(), question.getCreatedAt());
     }
 
