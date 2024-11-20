@@ -51,4 +51,24 @@ public class UserProfileService {
     public List<Question> getUserQuestions(Long userId) {
         return questionRepository.findByUserId(userId);
     }*/
+
+    public String getNickname(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        return user.getNickname();
+    }
+
+    public String getProfilePicture(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 업습니다"));
+        return user.getProfilePicture();
+    }
+
+    public int getAgeGroup(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        return user.getAgeGroup();
+    }
+
+    public String getRegion(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        return user.getRegion();
+    }
 }

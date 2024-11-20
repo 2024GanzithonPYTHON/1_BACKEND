@@ -81,4 +81,55 @@ public class UserProfileController {
         Long userId = (Long) session.getAttribute("userId");
         return ResponseEntity.ok(userProfileService.getUserQuestions(userId));
     }*/
+
+    @GetMapping("/nickname")
+    public ResponseEntity<?> getNickname(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        String nickname = userProfileService.getNickname(userId);
+        return ResponseEntity.ok(nickname);
+    }
+
+    // 프로필 사진 URL 조회
+    @GetMapping("/profile-picture")
+    public ResponseEntity<?> getProfilePicture(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        String profilePictureUrl = userProfileService.getProfilePicture(userId);
+        return ResponseEntity.ok(profilePictureUrl);
+    }
+
+    // 연령대 조회
+    @GetMapping("/age-group")
+    public ResponseEntity<?> getAgeGroup(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        int ageGroup = userProfileService.getAgeGroup(userId);
+        return ResponseEntity.ok(ageGroup);
+    }
+
+    // 거주지 조회
+    @GetMapping("/region")
+    public ResponseEntity<?> getRegion(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        String region = userProfileService.getRegion(userId);
+        return ResponseEntity.ok(region);
+    }
 }

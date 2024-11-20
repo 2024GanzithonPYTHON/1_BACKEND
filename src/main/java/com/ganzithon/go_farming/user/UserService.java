@@ -19,7 +19,7 @@ public class UserService {
     @Transactional
     public User registerUser(User user) {
         if (userRepository.existsByUsername(user.getUsername()) || userRepository.existsByNickname(user.getNickname())) {
-            throw new IllegalArgumentException("아이디나 닉네임이 이미 존재합니다.");
+            throw new IllegalArgumentException("이미 존재하는 아이디/닉네임 입니다.");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
