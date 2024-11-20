@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -18,14 +20,17 @@ public class Place extends BaseEntity<Place> {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Category category;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "province_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Province province;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "city_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private City city;
 
     private String address;

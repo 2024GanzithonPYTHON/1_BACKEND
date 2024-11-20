@@ -8,6 +8,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -17,10 +19,12 @@ public class ReviewKeyword extends BaseEntity<ReviewKeyword> {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "review_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Review review;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "keyword_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Keyword keyword;
 
 }
