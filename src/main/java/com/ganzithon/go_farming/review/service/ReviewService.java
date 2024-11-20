@@ -61,7 +61,7 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(Exceptions.PLACE_NOT_EXIST));
         List<Review> writtenReviews = reviewRepository.findAllByPlaceIdAndUserUserId(placeId, userId);
         int visitedCount = writtenReviews.size();
-        Review review = new Review(user, place, reviewRequestDTO, visitedCount);
+        Review review = new Review(user, place, reviewRequestDTO, visitedCount+1);
 
         reviewRepository.save(review);
 
