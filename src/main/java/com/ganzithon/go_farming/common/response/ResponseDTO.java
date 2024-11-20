@@ -13,4 +13,9 @@ public class ResponseDTO<T> {
         this.code = responses.getCode();
         this.data = data;
     }
+
+    public ResponseDTO(Responses responses) {
+        this.msg = responses.getMsg();
+        this.code = responses.getCode();
+    }
 }

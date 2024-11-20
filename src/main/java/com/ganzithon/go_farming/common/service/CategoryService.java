@@ -1,7 +1,6 @@
 package com.ganzithon.go_farming.common.service;
 
-import com.ganzithon.go_farming.common.domain.Category;
-import com.ganzithon.go_farming.common.domain.CategoryRepository;
+import com.ganzithon.go_farming.common.repository.CategoryRepository;
 import com.ganzithon.go_farming.common.dto.CategoryDTO;
 import com.ganzithon.go_farming.common.response.ResponseDTO;
 import com.ganzithon.go_farming.common.response.Responses;

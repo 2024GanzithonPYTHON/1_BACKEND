@@ -1,5 +1,6 @@
-package com.ganzithon.go_farming.common.domain;
+package com.ganzithon.go_farming.review.domain;
 
+import com.ganzithon.go_farming.common.domain.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -12,11 +13,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class City extends BaseEntity<City> {
+public class ReviewPhoto extends BaseEntity<ReviewPhoto> {
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "province_id")
-    private Province province;
-    private String name;
+    @JoinColumn(name = "review_id")
+    private Review review;
+
+    private String url;
 
 }

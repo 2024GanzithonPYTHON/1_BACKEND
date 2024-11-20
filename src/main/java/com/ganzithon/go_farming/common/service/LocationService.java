@@ -1,7 +1,7 @@
 package com.ganzithon.go_farming.common.service;
 
-import com.ganzithon.go_farming.common.domain.CityRepository;
-import com.ganzithon.go_farming.common.domain.ProvinceRepository;
+import com.ganzithon.go_farming.common.repository.CityRepository;
+import com.ganzithon.go_farming.common.repository.ProvinceRepository;
 import com.ganzithon.go_farming.common.dto.CityDTO;
 import com.ganzithon.go_farming.common.dto.ProvinceDTO;
 import com.ganzithon.go_farming.common.response.ResponseDTO;
