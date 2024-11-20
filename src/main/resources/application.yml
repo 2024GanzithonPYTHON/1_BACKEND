@@ -8,8 +8,6 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:test}
     default: aws
-  jackson:
-    property-naming-strategy: SNAKE_CASE
 
 logging:
   level:
