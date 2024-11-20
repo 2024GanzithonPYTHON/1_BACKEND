@@ -18,12 +18,23 @@ public class UserService {
 
     @Transactional
     public User registerUser(User user) {
-        if (userRepository.existsByUsername(user.getUsername()) || userRepository.existsByNickname(user.getNickname())) {
-            throw new IllegalArgumentException("아이디나 닉네임이 이미 존재합니다.");
+        // 아이디(username) 중복 확인
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
+
+        // 닉네임(nickname) 중복 확인
+        if (userRepository.existsByNickname(user.getNickname())) {
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        }
+
+        // 비밀번호 암호화
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // 사용자 저장
         return userRepository.save(user);
     }
+
 
     public Optional<User> loginUser(String username, String password) {
         Optional<User> user = userRepository.findByUsername(username);
