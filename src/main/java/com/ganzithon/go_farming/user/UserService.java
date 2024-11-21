@@ -1,5 +1,6 @@
 package com.ganzithon.go_farming.user;
 
+import com.ganzithon.go_farming.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Transactional
     public User registerUser(User user) {
@@ -35,16 +39,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
-    public Optional<User> loginUser(String username, String password) {
+    public String loginUser(String username, String password) {
+        // 사용자 조회
         Optional<User> user = userRepository.findByUsername(username);
+
+        // 비밀번호 검증
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            return user;
+            // JWT 토큰 생성
+            return jwtTokenUtil.generateToken(username);
         }
-        return Optional.empty();
+
+        throw new IllegalArgumentException("잘못된 아이디 또는 비밀번호입니다.");
     }
 
     public Optional<User> findById(Long userId) {
         return userRepository.findById(userId);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

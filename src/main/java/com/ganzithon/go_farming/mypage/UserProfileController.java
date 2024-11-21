@@ -1,13 +1,15 @@
 package com.ganzithon.go_farming.mypage;
 
-import com.ganzithon.go_farming.user.User;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.ganzithon.go_farming.review.domain.Question;
+import com.ganzithon.go_farming.review.domain.Review;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,117 +21,112 @@ public class UserProfileController {
 
     // 닉네임 수정
     @PatchMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@RequestBody Map<String, String> payload, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> updateNickname(@RequestBody Map<String, String> payload) {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String nickname = payload.get("nickname"); // JSON에서 "nickname" 키 가져오기
-        User updatedUser = userProfileService.updateNickname(userId, nickname);
-        return ResponseEntity.ok(updatedUser);
+        String nickname = payload.get("nickname");
+        return ResponseEntity.ok(userProfileService.updateNickname(username, nickname));
     }
 
     // 프로필 사진 URL 수정
     @PatchMapping("/profile-picture")
-    public ResponseEntity<?> updateProfilePicture(@RequestBody Map<String, String> payload, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> updateProfilePicture(@RequestBody Map<String, String> payload) {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String profilePictureUrl = payload.get("profilePictureUrl"); // JSON에서 "profilePictureUrl" 키 가져오기
-        User updatedUser = userProfileService.updateProfilePicture(userId, profilePictureUrl);
-        return ResponseEntity.ok(updatedUser);
+        String profilePictureUrl = payload.get("profilePictureUrl");
+        return ResponseEntity.ok(userProfileService.updateProfilePicture(username, profilePictureUrl));
     }
 
     // 비밀번호 수정
     @PatchMapping("/password")
-    public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> payload, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> payload) {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String password = payload.get("password"); // JSON에서 "password" 키 가져오기
-        User updatedUser = userProfileService.updatePassword(userId, password);
-        return ResponseEntity.ok(updatedUser);
+        String password = payload.get("password");
+        return ResponseEntity.ok(userProfileService.updatePassword(username, password));
     }
-    /*// 작성한 리뷰 조회
-    @GetMapping("/reviews")
-    public ResponseEntity<?> getUserReviews(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
-        }
 
-        Long userId = (Long) session.getAttribute("userId");
-        return ResponseEntity.ok(userProfileService.getUserReviews(userId));
-    }*/
-
-    // 작성한 질문 조회
-    /*@GetMapping("/questions")
-    public ResponseEntity<?> getUserQuestions(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
-        }
-
-        Long userId = (Long) session.getAttribute("userId");
-        return ResponseEntity.ok(userProfileService.getUserQuestions(userId));
-    }*/
-
+    // 닉네임 조회
     @GetMapping("/nickname")
-    public ResponseEntity<?> getNickname(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> getNickname() {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String nickname = userProfileService.getNickname(userId);
-        return ResponseEntity.ok(nickname);
+        return ResponseEntity.ok(userProfileService.getNickname(username));
     }
 
     // 프로필 사진 URL 조회
     @GetMapping("/profile-picture")
-    public ResponseEntity<?> getProfilePicture(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> getProfilePicture() {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String profilePictureUrl = userProfileService.getProfilePicture(userId);
-        return ResponseEntity.ok(profilePictureUrl);
+        return ResponseEntity.ok(userProfileService.getProfilePicture(username));
     }
 
     // 연령대 조회
     @GetMapping("/age-group")
-    public ResponseEntity<?> getAgeGroup(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> getAgeGroup() {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        int ageGroup = userProfileService.getAgeGroup(userId);
-        return ResponseEntity.ok(ageGroup);
+        return ResponseEntity.ok(userProfileService.getAgeGroup(username));
     }
 
     // 거주지 조회
     @GetMapping("/region")
-    public ResponseEntity<?> getRegion(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> getRegion() {
+        String username = getCurrentUsername();
+        if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
 
-        Long userId = (Long) session.getAttribute("userId");
-        String region = userProfileService.getRegion(userId);
-        return ResponseEntity.ok(region);
+        return ResponseEntity.ok(userProfileService.getRegion(username));
+    }
+
+    // 작성한 리뷰 조회
+    @GetMapping("/reviews")
+    public ResponseEntity<List<Review>> getUserReviews() {
+        String username = getCurrentUsername();
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        return ResponseEntity.ok(userProfileService.getUserReviews(username));
+    }
+
+    // 작성한 질문 조회
+    @GetMapping("/questions")
+    public ResponseEntity<List<Question>> getUserQuestions() {
+        String username = getCurrentUsername();
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        return ResponseEntity.ok(userProfileService.getUserQuestions(username));
+    }
+
+    // 현재 인증된 사용자명을 가져오는 헬퍼 메서드
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return authentication.getName();
     }
 }
