@@ -19,6 +19,8 @@ public class Folder {
 
     private String folderName; // 폴더 이름
 
+    private String color; // 폴더 색상 추가
+
     @ManyToOne // 여러Folder는 하나의User에 속할 수 있음 (다대일 관계)
     @JoinColumn(name = "user_id", nullable = false)
     // 데이터베이스에서 외래 키 이름을 "user_id"로 지정하고, null이 될 수 없도록 설정

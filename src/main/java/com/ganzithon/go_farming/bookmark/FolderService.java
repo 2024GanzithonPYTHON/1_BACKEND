@@ -5,6 +5,7 @@ import com.ganzithon.go_farming.user.User;
 import com.ganzithon.go_farming.user.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -13,6 +14,7 @@ public class FolderService {
     private final FolderRepository folderRepository;
     private final SavedLocationRepository savedLocationRepository;
     private final UserRepository userRepository;
+    private static final List<String> VALID_COLORS = Arrays.asList("RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
 
     public FolderService(FolderRepository folderRepository, SavedLocationRepository savedLocationRepository, UserRepository userRepository) {
         this.folderRepository = folderRepository;
@@ -31,7 +33,13 @@ public class FolderService {
     public Folder createFolder(String username, Folder folder) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!VALID_COLORS.contains(folder.getColor().toUpperCase())) {
+            throw new IllegalArgumentException("유효하지 않은 색상입니다: " + folder.getColor());
+        }
+
         folder.setUser(user);
+        folder.setColor(folder.getColor().toUpperCase()); // 색상 대문자로 설정
         return folderRepository.save(folder);
     }
 

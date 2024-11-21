@@ -39,8 +39,14 @@ public class FolderController {
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(folderService.createFolder(username, folder));
+
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(folderService.createFolder(username, folder));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
+
 
     // JWT 기반으로 폴더 삭제
     @DeleteMapping("/{folderId}")
