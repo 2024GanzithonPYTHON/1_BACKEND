@@ -1,10 +1,12 @@
 package com.ganzithon.go_farming.user;
 
+import com.ganzithon.go_farming.common.service.S3Service;
 import com.ganzithon.go_farming.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -19,6 +21,16 @@ public class UserService {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private S3Service s3Service; // S3에 사진 업로드를 처리하는 서비스
+
+    @Transactional
+    public String uploadProfilePicture(MultipartFile profilePicture) {
+        // S3에 파일 업로드 및 URL 반환
+        return s3Service.uploadFile(profilePicture, "profile-pictures");
+    }
+
 
     @Transactional
     public User registerUser(User user) {
