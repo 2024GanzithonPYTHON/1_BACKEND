@@ -1,16 +1,13 @@
 package com.ganzithon.go_farming.user;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.ganzithon.go_farming.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -21,20 +18,27 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @Autowired
-//    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDto userDto) {
+    @PostMapping(value = "/register", consumes = "multipart/form-data")
+    public ResponseEntity<?> registerUser(@RequestPart("user") UserRegistrationDto userDto,
+                                          @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture) {
         if (!userDto.getPassword().equals(userDto.getPasswordConfirm())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호가 일치하지 않습니다.");
         }
         try {
+            // 프로필 사진 처리
+            String profilePictureUrl = null;
+            if (profilePicture != null) {
+                profilePictureUrl = userService.uploadProfilePicture(profilePicture);
+            }
+
             User user = User.builder()
                     .username(userDto.getUsername())
                     .password(userDto.getPassword())
                     .nickname(userDto.getNickname())
-                    .profilePicture(userDto.getProfilePicture())
+                    .profilePicture(profilePictureUrl) // 저장된 URL 사용
                     .ageGroup(userDto.getAgeGroup())
                     .region(userDto.getRegion())
                     .build();
@@ -45,70 +49,39 @@ public class UserController {
         }
     }
 
+
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        Optional<User> user = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
-        if (user.isPresent()) {
-            HttpSession session = request.getSession();
-            session.setAttribute("userId", user.get().getUserId());
-            session.setAttribute("username", user.get().getUsername());
-            return ResponseEntity.ok().body("로그인 성공");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        try {
+            // 로그인 성공 시 JWT 토큰 생성
+            String token = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+            return ResponseEntity.ok().body("로그인 성공. Token: " + token);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-//        try {
-//            UsernamePasswordAuthenticationToken authRequest =
-//                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
-//
-//            // 인증 수행
-//            Authentication authentication = authenticationManager.authenticate(authRequest);
-//
-//            // SecurityContext에 인증 저장
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            // 세션에 SecurityContext 저장
-//            HttpSession session = request.getSession(true);
-//            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-//
-//            return ResponseEntity.ok().body("로그인 성공");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: " + e.getMessage());
-//        }
     }
 
-    /*@PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        return ResponseEntity.ok().body("로그아웃 성공");
-    }*/
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        // 클라이언트에게 JWT 삭제를 요청하는 메시지 반환
+        return ResponseEntity.ok().body("로그아웃 성공. 클라이언트에서 토큰을 삭제해주세요.");
+    }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    public ResponseEntity<?> getProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
-        Long userId = (Long) session.getAttribute("userId");
-        Optional<User> user = userService.findById(userId);
+
+        String username = authentication.getName();
+        Optional<User> user = userService.findByUsername(username);
 
         if (user.isPresent()) {
             return ResponseEntity.ok(user.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보 없음");
         }
-    }
-
-    @GetMapping("/check-session")
-    public ResponseEntity<?> checkSession(HttpSession session) {
-        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
-
-        if (securityContext == null || securityContext.getAuthentication() == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보 없음");
-        }
-
-        return ResponseEntity.ok("세션 인증된 사용자: " + securityContext.getAuthentication().getName());
     }
 }

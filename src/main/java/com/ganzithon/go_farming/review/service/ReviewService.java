@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,15 +52,15 @@ public class ReviewService {
     }
 
     @Transactional
-    public ResponseDTO<?> createReview(ReviewRequestDTO reviewRequestDTO, Long userId, Long placeId,
+    public ResponseDTO<?> createReview(ReviewRequestDTO reviewRequestDTO, String username, Long placeId,
                                        List<MultipartFile> photos) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(Exceptions.PLACE_NOT_EXIST));
-        List<Review> writtenReviews = reviewRepository.findAllByPlaceIdAndUserUserId(placeId, userId);
+        List<Review> writtenReviews = reviewRepository.findAllByPlaceIdAndUserUserId(placeId, user.getUserId());
         int visitedCount = writtenReviews.size();
-        Review review = new Review(user, place, reviewRequestDTO, visitedCount+1);
+        Review review = new Review(user, place, reviewRequestDTO, visitedCount + 1);
 
         reviewRepository.save(review);
 
@@ -86,24 +85,26 @@ public class ReviewService {
     }
 
     @Transactional
-    public ResponseDTO<?> deleteReview(Long reviewId, Long userId) {
+    public ResponseDTO<?> deleteReview(Long reviewId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(Exceptions.REVIEW_NOT_EXIST));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
-        if (review.getUser() != user) { throw new CustomException(Exceptions.UNAUTHORIZED);}
+        if (!review.getUser().equals(user)) {
+            throw new CustomException(Exceptions.UNAUTHORIZED);
+        }
         reviewRepository.delete(review);
         return new ResponseDTO<>(Responses.NO_CONTENT);
     }
 
     @Transactional
-    public ResponseDTO<?> likeReview(Long reviewId, Long userId) {
+    public ResponseDTO<?> likeReview(Long reviewId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(Exceptions.REVIEW_NOT_EXIST));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
 
-        Optional<Like> like = likeRepository.findByUserUserIdAndReviewId(userId, reviewId);
+        Optional<Like> like = likeRepository.findByUserUserIdAndReviewId(user.getUserId(), reviewId);
         if (like.isPresent()) {
             likeRepository.delete(like.get());
             review.dislike();
@@ -114,5 +115,4 @@ public class ReviewService {
 
         return new ResponseDTO<>(Responses.OK);
     }
-
 }
