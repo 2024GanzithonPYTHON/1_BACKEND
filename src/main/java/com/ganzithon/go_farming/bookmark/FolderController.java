@@ -1,6 +1,7 @@
 package com.ganzithon.go_farming.bookmark;
 
 //import com.ganzithon.go_farming.location.Location;
+import com.ganzithon.go_farming.common.domain.Place;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,38 +75,38 @@ public class FolderController {
         }
     }
 
-    // JWT 기반으로 폴더에 위치 추가
-    /*@PostMapping("/{folderId}/locations")
-    public ResponseEntity<?> addLocation(@PathVariable Long folderId, @RequestBody Location location) {
+    // JWT 기반으로 폴더에 Place 추가
+    @PostMapping("/{folderId}/places/{placeId}")
+    public ResponseEntity<?> addPlaceToFolder(@PathVariable Long folderId, @PathVariable Long placeId) {
         try {
-            folderService.addLocationToFolder(folderId, location);
-            return ResponseEntity.status(HttpStatus.CREATED).body("위치가 폴더에 추가되었습니다.");
+            Place place = folderService.addPlaceToFolder(folderId, placeId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(place);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // JWT 기반으로 폴더에서 위치 제거
-    @DeleteMapping("/{folderId}/locations/{locationId}")
-    public ResponseEntity<?> removeLocation(@PathVariable Long folderId, @PathVariable Long locationId) {
+    // JWT 기반으로 폴더에서 Place 제거
+    @DeleteMapping("/{folderId}/places/{placeId}")
+    public ResponseEntity<?> removePlaceFromFolder(@PathVariable Long folderId, @PathVariable Long placeId) {
         try {
-            folderService.removeLocationFromFolder(folderId, locationId);
-            return ResponseEntity.ok("위치가 폴더에서 제거되었습니다.");
+            folderService.removePlaceFromFolder(folderId, placeId);
+            return ResponseEntity.ok("Place removed from folder.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // 폴더 안의 위치 조회
-    @GetMapping("/{folderId}/locations")
-    public ResponseEntity<?> getLocationsInFolder(@PathVariable Long folderId) {
+    // 폴더 안의 Place 조회
+    @GetMapping("/{folderId}/places")
+    public ResponseEntity<?> getPlacesInFolder(@PathVariable Long folderId) {
         try {
-            List<Location> locations = folderService.getLocationsInFolder(folderId);
-            return ResponseEntity.ok(locations);
+            List<Place> places = folderService.getPlacesInFolder(folderId);
+            return ResponseEntity.ok(places);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-    }*/
+    }
 
     // 현재 인증된 사용자명을 가져오는 헬퍼 메서드
     private String getCurrentUsername() {

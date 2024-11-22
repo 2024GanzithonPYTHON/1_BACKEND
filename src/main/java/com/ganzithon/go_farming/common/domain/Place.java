@@ -1,5 +1,6 @@
 package com.ganzithon.go_farming.common.domain;
 
+import com.ganzithon.go_farming.bookmark.Folder;
 import com.ganzithon.go_farming.review.domain.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,5 +41,8 @@ public class Place extends BaseEntity<Place> {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
+
+
+
 
 }
