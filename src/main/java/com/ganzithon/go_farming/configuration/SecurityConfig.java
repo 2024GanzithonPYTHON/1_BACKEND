@@ -35,7 +35,7 @@ public class SecurityConfig {
 		http
 				// 접근 허용 URL 설정
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/users/register", "/users/login", "/province/**", "/category", "/**").permitAll()
+						.requestMatchers("/users/register", "/users/login", "/province/**", "/category").permitAll()
 						.anyRequest().authenticated()
 				)
 				// CSRF 보호 비활성화 (API를 위해)
