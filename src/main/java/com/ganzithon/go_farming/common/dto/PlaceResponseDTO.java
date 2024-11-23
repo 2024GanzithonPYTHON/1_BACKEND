@@ -20,10 +20,11 @@ public class PlaceResponseDTO {
     private String contact;
     private List<Map<String, Long>> keywords;
     private String imageUrl;
+    private List<String> savedFolderColors;
 
-    public static PlaceResponseDTO of(Place place, List<Map<String, Long>> keywords, String imageUrl){
+    public static PlaceResponseDTO of(Place place, List<Map<String, Long>> keywords, String imageUrl, List<String> savedFolderColors){
         return new PlaceResponseDTO(place.getId(), place.getKakaoId(), place.getName(),
             place.getCategory().getName(), place.getAddress(), place.getContact(), keywords,
-                imageUrl);}
+                imageUrl, savedFolderColors);}
 
 }

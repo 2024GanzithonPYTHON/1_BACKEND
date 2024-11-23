@@ -1,5 +1,7 @@
 package com.ganzithon.go_farming.common.service;
 
+import com.ganzithon.go_farming.bookmark.Folder;
+import com.ganzithon.go_farming.bookmark.FolderRepository;
 import com.ganzithon.go_farming.common.domain.Category;
 import com.ganzithon.go_farming.common.domain.City;
 import com.ganzithon.go_farming.common.domain.Province;
@@ -20,6 +22,8 @@ import com.ganzithon.go_farming.review.domain.ReviewPhoto;
 import com.ganzithon.go_farming.review.dto.KeywordCountDTO;
 import com.ganzithon.go_farming.review.repository.ReviewKeywordRepository;
 import com.ganzithon.go_farming.review.repository.ReviewRepository;
+import com.ganzithon.go_farming.user.User;
+import com.ganzithon.go_farming.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,14 +42,18 @@ public class PlaceService {
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
     private final ReviewRepository reviewRepository;
+    private final FolderRepository folderRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public ResponseDTO<PlaceResponseDTO> findPlaceByKakaoId(PlaceRequestDTO dto) {
+    public ResponseDTO<PlaceResponseDTO> findPlaceByKakaoId(PlaceRequestDTO dto, String username) {
         Optional<Place> tempPlace = placeRepository.findByKakaoId(dto.getKakaoId());
         PlaceResponseDTO result;
         if (tempPlace.isPresent()) { // 이미 우리 서비스에 저장된 장소면
             Place place = tempPlace.get();
-            result = PlaceResponseDTO.of(place, getRankedKeywords(place.getId()), getRandomImageUrl(place.getId()));
+            Long placeId = place.getId();
+            result = PlaceResponseDTO.of(place, getRankedKeywords(placeId), getRandomImageUrl(placeId),
+                    getSavedFolderColors(placeId, username));
         } else { // 아직 없는 장소면 저장
             List<KakaoResponseDTO.Document> docs = kakaoService.search(dto.getName());
 
@@ -68,24 +76,27 @@ public class PlaceService {
                     document.getPhone(), Long.parseLong(document.getId()), new ArrayList<>());
             placeRepository.save(place);
 
-            result = PlaceResponseDTO.of(place, new ArrayList<>(), null);
+            result = PlaceResponseDTO.of(place, new ArrayList<>(), null, new ArrayList<>());
         }
         return new ResponseDTO<>(result, Responses.OK);
 
     }
 
-    public ResponseDTO<List<PlaceResponseDTO>> findPlaceByCondition(Long categoryId, Long provinceId, Long cityId) {
+    public ResponseDTO<List<PlaceResponseDTO>> findPlaceByCondition(Long categoryId, Long provinceId, Long cityId, String username) {
         List<Place> places = placeRepository.findPlacesByFilters(categoryId, provinceId, cityId);
-        List<PlaceResponseDTO> result = places.stream().map(place -> PlaceResponseDTO.of(place, getRankedKeywords(place.getId()), getRandomImageUrl(place.getId()))).toList();
+        List<PlaceResponseDTO> result = places.stream()
+                .map(place -> PlaceResponseDTO.of(place, getRankedKeywords(place.getId()),
+                        getRandomImageUrl(place.getId()), getSavedFolderColors(place.getId(), username))).toList();
 
         return new ResponseDTO<>(result, Responses.OK);
     }
 
-    public ResponseDTO<PlaceResponseDTO> findPlaceById(Long placeId) {
+    public ResponseDTO<PlaceResponseDTO> findPlaceById(Long placeId, String username) {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(Exceptions.PLACE_NOT_EXIST));
 
-        return new ResponseDTO<>(PlaceResponseDTO.of(place, getRankedKeywords(placeId), getRandomImageUrl(placeId)), Responses.OK);
+        return new ResponseDTO<>(PlaceResponseDTO.of(place, getRankedKeywords(placeId), getRandomImageUrl(placeId),
+                getSavedFolderColors(placeId, username)), Responses.OK);
     }
 
     private static List<Map<String, Long>> sortTopKeywords(List<KeywordCountDTO> keywords) {
@@ -106,7 +117,16 @@ public class PlaceService {
                 .flatMap(review -> review.getPhotos().stream().map(ReviewPhoto::getUrl))
                 .toList();
         Random random = new Random();
-        int randomNumber = random.nextInt( reviewImageUrls.size() + 1);
+        int randomNumber = random.nextInt(reviewImageUrls.size());
         return reviewImageUrls.get(randomNumber);
+    }
+
+    private List<String> getSavedFolderColors(Long placeId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(Exceptions.MEMBER_NOT_EXIST));
+        List<String> result = folderRepository.findByUserUserId(user.getUserId())
+                .stream().map(Folder::getColor).toList();
+        return result;
+
     }
 }
