@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     Optional<Place> findById(Long placeId);
     Optional<Place> findByKakaoId(Long kakaoId);
-    @Query("SELECT p FROM Place p WHERE " +
+    @Query("SELECT DISTINCT p FROM Place p JOIN p.reviews r WHERE " +
             "(:category IS NULL OR p.category.id = :category) AND " +
             "(:province IS NULL OR p.province.id = :province) AND " +
             "(:city IS NULL OR p.city.id = :city)")
