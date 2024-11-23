@@ -20,6 +20,7 @@ import com.ganzithon.go_farming.common.response.Responses;
 import com.ganzithon.go_farming.review.domain.Review;
 import com.ganzithon.go_farming.review.domain.ReviewPhoto;
 import com.ganzithon.go_farming.review.dto.KeywordCountDTO;
+import com.ganzithon.go_farming.review.dto.PlaceResponseWithCountDTO;
 import com.ganzithon.go_farming.review.repository.ReviewKeywordRepository;
 import com.ganzithon.go_farming.review.repository.ReviewRepository;
 import com.ganzithon.go_farming.user.User;
@@ -82,12 +83,12 @@ public class PlaceService {
 
     }
 
-    public ResponseDTO<List<PlaceResponseDTO>> findPlaceByCondition(Long categoryId, Long provinceId, Long cityId, String username) {
+    public ResponseDTO<PlaceResponseWithCountDTO> findPlaceByCondition(Long categoryId, Long provinceId, Long cityId, String username) {
         List<Place> places = placeRepository.findPlacesByFilters(categoryId, provinceId, cityId);
-        List<PlaceResponseDTO> result = places.stream()
+        List<PlaceResponseDTO> dtos = places.stream()
                 .map(place -> PlaceResponseDTO.of(place, getRankedKeywords(place.getId()),
                         getRandomImageUrl(place.getId()), getSavedFolderColors(place.getId(), username))).toList();
-
+        PlaceResponseWithCountDTO result = new PlaceResponseWithCountDTO(dtos, dtos.size());
         return new ResponseDTO<>(result, Responses.OK);
     }
 

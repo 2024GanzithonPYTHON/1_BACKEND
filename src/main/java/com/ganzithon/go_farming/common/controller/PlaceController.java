@@ -6,6 +6,7 @@ import com.ganzithon.go_farming.common.exception.CustomException;
 import com.ganzithon.go_farming.common.exception.Exceptions;
 import com.ganzithon.go_farming.common.response.ResponseDTO;
 import com.ganzithon.go_farming.common.service.PlaceService;
+import com.ganzithon.go_farming.review.dto.PlaceResponseWithCountDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +32,7 @@ public class PlaceController {
     }
 
     @GetMapping
-    public ResponseDTO<List<PlaceResponseDTO>> findPlacesByCondition(
+    public ResponseDTO<PlaceResponseWithCountDTO> findPlacesByCondition(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long provinceId,
             @RequestParam(required = false) Long cityId) {
