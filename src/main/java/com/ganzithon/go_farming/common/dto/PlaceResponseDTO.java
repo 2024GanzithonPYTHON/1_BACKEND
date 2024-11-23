@@ -15,13 +15,15 @@ public class PlaceResponseDTO {
     private Long id;
     private Long kakaoId;
     private String name;
-    private Long categoryId;
+    private String category;
     private String address;
     private String contact;
     private List<Map<String, Long>> keywords;
+    private String imageUrl;
 
-    public static PlaceResponseDTO of(Place place, List<Map<String, Long>> keywords){
+    public static PlaceResponseDTO of(Place place, List<Map<String, Long>> keywords, String imageUrl){
         return new PlaceResponseDTO(place.getId(), place.getKakaoId(), place.getName(),
-            place.getCategory().getId(), place.getAddress(), place.getContact(), keywords);}
+            place.getCategory().getName(), place.getAddress(), place.getContact(), keywords,
+                imageUrl);}
 
 }
