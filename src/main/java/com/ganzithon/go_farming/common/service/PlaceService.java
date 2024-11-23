@@ -117,7 +117,7 @@ public class PlaceService {
                 .flatMap(review -> review.getPhotos().stream().map(ReviewPhoto::getUrl))
                 .toList();
         Random random = new Random();
-        int randomNumber = random.nextInt( reviewImageUrls.size() + 1);
+        int randomNumber = random.nextInt(reviewImageUrls.size());
         return reviewImageUrls.get(randomNumber);
     }
 
