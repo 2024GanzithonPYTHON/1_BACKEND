@@ -14,7 +14,7 @@ import java.util.List;
 public class ReviewResponseDTO {
 
     private Long id;
-    private Long userId;
+    private String username;
     private Long placeId;
     private String content;
     private List<String> photos;
@@ -25,7 +25,7 @@ public class ReviewResponseDTO {
 
     public static ReviewResponseDTO of(Review review) {
         return new ReviewResponseDTO(
-                review.getId(), review.getUser().getUserId(),
+                review.getId(), review.getUser().getUsername(),
                 review.getPlace().getId(), review.getContent(),
                 review.getPhotos().stream().map(ReviewPhoto::getUrl).toList(),
                 review.getQuestions().stream().map(QuestionResponseDTO::of).toList(),
