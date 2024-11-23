@@ -27,7 +27,7 @@ public class PlaceController {
             throw new CustomException(Exceptions.UNAUTHORIZED);
         }
 
-        return placeService.findPlaceByKakaoId(dto);
+        return placeService.findPlaceByKakaoId(dto, username);
     }
 
     @GetMapping
@@ -40,7 +40,7 @@ public class PlaceController {
             throw new CustomException(Exceptions.UNAUTHORIZED);
         }
 
-        return placeService.findPlaceByCondition(categoryId, provinceId, cityId);
+        return placeService.findPlaceByCondition(categoryId, provinceId, cityId, username);
     }
 
     @GetMapping("/{placeId}")
@@ -50,7 +50,7 @@ public class PlaceController {
             throw new CustomException(Exceptions.UNAUTHORIZED);
         }
 
-        return placeService.findPlaceById(placeId);
+        return placeService.findPlaceById(placeId, username);
     }
 
     // 현재 인증된 사용자명을 가져오는 헬퍼 메서드
