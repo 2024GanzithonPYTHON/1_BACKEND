@@ -15,16 +15,16 @@ import com.ganzithon.go_farming.common.repository.CategoryRepository;
 import com.ganzithon.go_farming.common.repository.PlaceRepository;
 import com.ganzithon.go_farming.common.response.ResponseDTO;
 import com.ganzithon.go_farming.common.response.Responses;
+import com.ganzithon.go_farming.review.domain.Review;
+import com.ganzithon.go_farming.review.domain.ReviewPhoto;
 import com.ganzithon.go_farming.review.dto.KeywordCountDTO;
 import com.ganzithon.go_farming.review.repository.ReviewKeywordRepository;
+import com.ganzithon.go_farming.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +37,7 @@ public class PlaceService {
     private final CategoryRepository categoryRepository;
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ResponseDTO<PlaceResponseDTO> findPlaceByKakaoId(PlaceRequestDTO dto) {
@@ -44,9 +45,7 @@ public class PlaceService {
         PlaceResponseDTO result;
         if (tempPlace.isPresent()) { // 이미 우리 서비스에 저장된 장소면
             Place place = tempPlace.get();
-            List<KeywordCountDTO> keywords = reviewKeywordRepository.findKeywordCountsByPlace(place.getId());
-            List<Map<String, Long>> rankedKeywords = sortTopKeywords(keywords);
-            result = PlaceResponseDTO.of(place, rankedKeywords);
+            result = PlaceResponseDTO.of(place, getRankedKeywords(place.getId()), getRandomImageUrl(place.getId()));
         } else { // 아직 없는 장소면 저장
             List<KakaoResponseDTO.Document> docs = kakaoService.search(dto.getName());
 
@@ -69,7 +68,7 @@ public class PlaceService {
                     document.getPhone(), Long.parseLong(document.getId()), new ArrayList<>());
             placeRepository.save(place);
 
-            result = PlaceResponseDTO.of(place, new ArrayList<>());
+            result = PlaceResponseDTO.of(place, new ArrayList<>(), null);
         }
         return new ResponseDTO<>(result, Responses.OK);
 
@@ -77,11 +76,7 @@ public class PlaceService {
 
     public ResponseDTO<List<PlaceResponseDTO>> findPlaceByCondition(Long categoryId, Long provinceId, Long cityId) {
         List<Place> places = placeRepository.findPlacesByFilters(categoryId, provinceId, cityId);
-        List<PlaceResponseDTO> result = places.stream().map(place -> {
-            List<KeywordCountDTO> keywords = reviewKeywordRepository.findKeywordCountsByPlace(place.getId());
-            List<Map<String, Long>> rankedKeywords = sortTopKeywords(keywords);
-            return PlaceResponseDTO.of(place, rankedKeywords);
-        }).toList();
+        List<PlaceResponseDTO> result = places.stream().map(place -> PlaceResponseDTO.of(place, getRankedKeywords(place.getId()), getRandomImageUrl(place.getId()))).toList();
 
         return new ResponseDTO<>(result, Responses.OK);
     }
@@ -90,10 +85,7 @@ public class PlaceService {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(Exceptions.PLACE_NOT_EXIST));
 
-        List<KeywordCountDTO> keywords = reviewKeywordRepository.findKeywordCountsByPlace(placeId);
-        List<Map<String, Long>> rankedKeywords = sortTopKeywords(keywords);
-
-        return new ResponseDTO<>(PlaceResponseDTO.of(place, rankedKeywords), Responses.OK);
+        return new ResponseDTO<>(PlaceResponseDTO.of(place, getRankedKeywords(placeId), getRandomImageUrl(placeId)), Responses.OK);
     }
 
     private static List<Map<String, Long>> sortTopKeywords(List<KeywordCountDTO> keywords) {
@@ -102,5 +94,19 @@ public class PlaceService {
                 .limit(3) // 상위 3개만 선택
                 .map(dto -> Map.of(dto.getName(), dto.getCount())) // DTO를 Map으로 변환
                 .collect(Collectors.toList());
+    }
+
+    private List<Map<String, Long>> getRankedKeywords(Long placeId) {
+        List<KeywordCountDTO> keywords = reviewKeywordRepository.findKeywordCountsByPlace(placeId);
+        return sortTopKeywords(keywords);
+    }
+
+    private String getRandomImageUrl(Long placeId) {
+        List<String> reviewImageUrls = reviewRepository.findAllByPlaceId(placeId).stream()
+                .flatMap(review -> review.getPhotos().stream().map(ReviewPhoto::getUrl))
+                .toList();
+        Random random = new Random();
+        int randomNumber = random.nextInt( reviewImageUrls.size() + 1);
+        return reviewImageUrls.get(randomNumber);
     }
 }
